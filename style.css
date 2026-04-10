@@ -1,0 +1,264 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom, #eef8ee, #ffffff, #f6f7f8);
+  color: #1f2937;
+}
+
+.app {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.top-logo,
+.card,
+.footer {
+  background: white;
+  border-radius: 24px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+}
+
+.bruxeo-logo,
+.digibrux-logo {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.plant-photo {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 18px;
+  margin-bottom: 16px;
+}
+
+.title-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: #dcfce7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.7rem;
+}
+
+.subtitle {
+  margin: 4px 0 0 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.status-box,
+.info-box,
+.plant-link {
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.status-ok {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+}
+
+.status-late {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.8);
+  font-size: 0.85rem;
+  border: 1px solid #d1d5db;
+}
+
+.status-message {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.green-text {
+  color: #16a34a;
+}
+
+.red-text {
+  color: #dc2626;
+}
+
+.status-detail,
+.info-label,
+.plant-link p,
+.qr-card p,
+.page-url {
+  color: #6b7280;
+}
+
+.info-label {
+  margin: 0 0 6px 0;
+  font-size: 0.9rem;
+}
+
+.info-value {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.interval-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.interval-row input,
+.modal-content input {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+}
+
+.interval-row input {
+  width: 90px;
+}
+
+.plant-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+}
+
+.main-button,
+.secondary-button {
+  width: 100%;
+  border: none;
+  border-radius: 16px;
+  padding: 14px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.main-button {
+  background: #111827;
+  color: white;
+}
+
+.main-button.small {
+  width: auto;
+  min-width: 90px;
+}
+
+.secondary-button {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.thank-you {
+  background: #dcfce7;
+  color: #166534;
+  padding: 14px;
+  border-radius: 16px;
+  text-align: center;
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+.hidden {
+  display: none;
+}
+
+.qr-card h2 {
+  margin-top: 0;
+}
+
+.page-url {
+  word-break: break-all;
+  font-size: 0.9rem;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.digibrux-logo {
+  max-height: 40px;
+  width: auto;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 24px;
+  padding: 20px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+}
+
+.modal-content label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.modal-content input {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
