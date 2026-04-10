@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arrosage de la plante - BRUXEO</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="top-logo">
+      <img src="logo-horizontal-cmjn.jpg" alt="Logo BRUXEO" class="bruxeo-logo" />
+    </header>
+
+    <main class="card">
+      <img src="pachira-aquatica3.jpg" alt="Pachira Aquatica" class="plant-photo" />
+
+      <div class="title-row">
+        <div class="icon">🌿</div>
+        <div>
+          <h1>Pachira Aquatica</h1>
+          <p class="subtitle">Suivi simple de l’arrosage</p>
+        </div>
+      </div>
+
+      <section id="statusBox" class="status-box">
+        <div class="status-header">
+          <span id="statusLabel" class="badge">Statut</span>
+          <span id="statusIcon" class="status-icon">💧</span>
+        </div>
+        <p id="statusMessage" class="status-message"></p>
+        <p id="statusDetail" class="status-detail"></p>
+      </section>
+
+      <section class="info-box">
+        <p class="info-label">Dernière personne</p>
+        <p id="lastWateredBy" class="info-value">Personne pour le moment</p>
+      </section>
+
+      <section class="info-box">
+        <p class="info-label">Dernier arrosage</p>
+        <p id="lastWateredAt" class="info-value">Jamais arrosée</p>
+      </section>
+
+      <section class="info-box">
+        <label class="info-label" for="wateringInterval">Fréquence d’arrosage</label>
+        <div class="interval-row">
+          <input id="wateringInterval" type="number" min="1" value="7" />
+          <span>jour(s)</span>
+        </div>
+      </section>
+
+      <a
+        class="plant-link"
+        href="https://entretien-plante-interieur.fr/plantes-faciles/entretien-du-pachira-aquatica/#arrosage-du-pachira-quelle-quantite-deau-et-quelle-frequence"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <div>
+          <strong>En savoir plus sur la plante</strong>
+          <p>Conseils d’entretien et d’arrosage</p>
+        </div>
+        <span>↗</span>
+      </a>
+
+      <button id="waterButton" class="main-button">Je veux arroser la plante</button>
+
+      <div id="thankYouMessage" class="thank-you hidden">
+        Merci d’avoir arrosé la plante.
+      </div>
+    </main>
+
+    <section class="card qr-card">
+      <h2>QR code d’accès</h2>
+      <p>Après publication, vous pourrez créer un QR code pointant vers l’adresse de cette page.</p>
+      <p id="pageUrl" class="page-url"></p>
+    </section>
+
+    <footer class="footer">
+      <span>developped with love by</span>
+      <img src="Logo digibrux 2026 hd.png" alt="Logo Digibrux" class="digibrux-logo" />
+    </footer>
+  </div>
+
+  <div id="nameModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Qui arrose la plante ?</h3>
+      <label for="personName">Votre prénom ou votre nom</label>
+      <input id="personName" type="text" placeholder="Ex. Julien" />
+      <div class="modal-actions">
+        <button id="cancelButton" class="secondary-button">Annuler</button>
+        <button id="confirmButton" class="main-button small">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
