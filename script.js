@@ -1,3 +1,5 @@
+document.addEventListener("DOMContentLoaded", () => {
+
 const SUPABASE_URL = "https://ngnnskdmmkilytdbdtts.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_NrSZ8cvWZO0WwhsvxIwsOQ_c-3JDaEK";
 const PLANT_SLUG = "pachira-bruxeo";
@@ -5,6 +7,7 @@ const DAY_MS = 1000 * 60 * 60 * 24;
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// éléments DOM
 const statusBox = document.getElementById("statusBox");
 const statusLabel = document.getElementById("statusLabel");
 const statusIcon = document.getElementById("statusIcon");
@@ -23,6 +26,7 @@ const pageUrl = document.getElementById("pageUrl");
 
 let plant = null;
 
+// utils
 function formatDate(dateString) {
   if (!dateString) return "Jamais arrosée";
 
@@ -43,6 +47,7 @@ function diffInDays(fromDate, toDate) {
   return Math.floor((toDate.getTime() - fromDate.getTime()) / DAY_MS);
 }
 
+// charger plante
 async function loadPlant() {
   const { data, error } = await supabaseClient
     .from("plants")
@@ -59,6 +64,7 @@ async function loadPlant() {
   render();
 }
 
+// affichage
 function render() {
   if (!plant) return;
 
@@ -118,22 +124,18 @@ function render() {
   }
 }
 
+// événements
 wateringInterval.addEventListener("change", async () => {
   if (!plant) return;
 
   const value = Math.max(1, Number(wateringInterval.value) || 1);
 
-  const { data, error } = await supabaseClient
+  const { data } = await supabaseClient
     .from("plants")
     .update({ watering_interval_days: value })
     .eq("id", plant.id)
     .select()
     .single();
-
-  if (error) {
-    console.error("Erreur mise à jour fréquence:", error);
-    return;
-  }
 
   plant = data;
   render();
@@ -152,11 +154,10 @@ cancelButton.addEventListener("click", () => {
 confirmButton.addEventListener("click", validateWatering);
 
 personName.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    validateWatering();
-  }
+  if (e.key === "Enter") validateWatering();
 });
 
+// validation
 async function validateWatering() {
   if (!plant) return;
 
@@ -165,7 +166,7 @@ async function validateWatering() {
 
   const nowIso = new Date().toISOString();
 
-  const updateResult = await supabaseClient
+  const { data } = await supabaseClient
     .from("plants")
     .update({
       last_watered_by: name,
@@ -175,11 +176,6 @@ async function validateWatering() {
     .select()
     .single();
 
-  if (updateResult.error) {
-    console.error("Erreur mise à jour plante:", updateResult.error);
-    return;
-  }
-
   await supabaseClient
     .from("watering_log")
     .insert({
@@ -188,7 +184,7 @@ async function validateWatering() {
       watered_at: nowIso
     });
 
-  plant = updateResult.data;
+  plant = data;
   render();
 
   nameModal.classList.add("hidden");
@@ -199,4 +195,7 @@ async function validateWatering() {
   }, 2500);
 }
 
+// init
 loadPlant();
+
+});
