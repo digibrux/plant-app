@@ -79,12 +79,17 @@ h1 {
   margin-bottom: 12px;
 }
 
-.status-ok {
+.status-green {
   background: #ecfdf5;
   border-color: #bbf7d0;
 }
 
-.status-late {
+.status-orange {
+  background: #fff7ed;
+  border-color: #fdba74;
+}
+
+.status-red {
   background: #fef2f2;
   border-color: #fecaca;
 }
@@ -100,22 +105,26 @@ h1 {
   display: inline-block;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255, 255, 255, 0.85);
   font-size: 0.85rem;
   border: 1px solid #d1d5db;
 }
 
 .status-message {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: bold;
   margin: 0 0 8px 0;
 }
 
-.green-text {
+.status-green-text {
   color: #16a34a;
 }
 
-.red-text {
+.status-orange-text {
+  color: #ea580c;
+}
+
+.status-red-text {
   color: #dc2626;
 }
 
@@ -199,21 +208,21 @@ h1 {
   font-weight: 600;
 }
 
-/* =========================
-   MODAL (correction ici)
-   ========================= */
+.hidden {
+  display: none;
+}
 
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.35);
+  background: rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
+  z-index: 1000;
 }
 
-/* 🔴 Correction essentielle */
 .modal.hidden {
   display: none;
 }
@@ -243,12 +252,6 @@ h1 {
 .modal-actions {
   display: flex;
   gap: 10px;
-}
-
-/* ========================= */
-
-.hidden {
-  display: none;
 }
 
 .qr-card h2 {
