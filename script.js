@@ -1,15 +1,9 @@
 const SUPABASE_URL = "https://ngnnskdmmkilytdbdtts.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nbm5za2RtbWtpbHl0ZGJkdHRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MDE2NDQsImV4cCI6MjA5MTQ3NzY0NH0.KJD56TEcsn06BxTbtAq55EomdvhJbhJ9JsQxVS9CV7w";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const STORAGE_KEY = "plant-watering-app-static-v1";
+const PLANT_SLUG = "pachira-bruxeo";
 const DAY_MS = 1000 * 60 * 60 * 24;
 
-const defaultData = {
-  plantName: "Pachira Aquatica",
-  wateringIntervalDays: 7,
-  lastWateredAt: null,
-  lastWateredBy: "Personne pour le moment"
-};
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const statusBox = document.getElementById("statusBox");
 const statusLabel = document.getElementById("statusLabel");
@@ -27,20 +21,7 @@ const cancelButton = document.getElementById("cancelButton");
 const confirmButton = document.getElementById("confirmButton");
 const pageUrl = document.getElementById("pageUrl");
 
-function loadData() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return { ...defaultData };
-
-  try {
-    return { ...defaultData, ...JSON.parse(saved) };
-  } catch {
-    return { ...defaultData };
-  }
-}
-
-function saveData(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
+let plant = null;
 
 function formatDate(dateString) {
   if (!dateString) return "Jamais arrosée";
@@ -62,18 +43,35 @@ function diffInDays(fromDate, toDate) {
   return Math.floor((toDate.getTime() - fromDate.getTime()) / DAY_MS);
 }
 
-let data = loadData();
+async function loadPlant() {
+  const { data, error } = await supabaseClient
+    .from("plants")
+    .select("*")
+    .eq("slug", PLANT_SLUG)
+    .single();
+
+  if (error) {
+    console.error("Erreur chargement plante :", error);
+    alert("Impossible de charger les données de la plante.");
+    return;
+  }
+
+  plant = data;
+  render();
+}
 
 function render() {
-  lastWateredBy.textContent = data.lastWateredBy;
-  lastWateredAt.textContent = formatDate(data.lastWateredAt);
-  wateringInterval.value = data.wateringIntervalDays;
+  if (!plant) return;
+
+  lastWateredBy.textContent = plant.last_watered_by || "Personne pour le moment";
+  lastWateredAt.textContent = formatDate(plant.last_watered_at);
+  wateringInterval.value = plant.watering_interval_days;
   pageUrl.textContent = window.location.href;
 
   statusBox.classList.remove("status-ok", "status-late");
   statusMessage.classList.remove("green-text", "red-text");
 
-  if (!data.lastWateredAt) {
+  if (!plant.last_watered_at) {
     statusBox.classList.add("status-late");
     statusLabel.textContent = "Arrosage à faire";
     statusIcon.textContent = "⚠️";
@@ -83,8 +81,8 @@ function render() {
     return;
   }
 
-  const lastDate = new Date(data.lastWateredAt);
-  const dueDate = new Date(lastDate.getTime() + data.wateringIntervalDays * DAY_MS);
+  const lastDate = new Date(plant.last_watered_at);
+  const dueDate = new Date(lastDate.getTime() + plant.watering_interval_days * DAY_MS);
   const today = startOfToday();
   const dueDateStart = new Date(dueDate);
   dueDateStart.setHours(0, 0, 0, 0);
@@ -121,10 +119,25 @@ function render() {
   }
 }
 
-wateringInterval.addEventListener("change", () => {
+wateringInterval.addEventListener("change", async () => {
+  if (!plant) return;
+
   const value = Math.max(1, Number(wateringInterval.value) || 1);
-  data.wateringIntervalDays = value;
-  saveData(data);
+
+  const { data, error } = await supabaseClient
+    .from("plants")
+    .update({ watering_interval_days: value })
+    .eq("id", plant.id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Erreur mise à jour fréquence :", error);
+    alert("Impossible de mettre à jour la fréquence d’arrosage.");
+    return;
+  }
+
+  plant = data;
   render();
 });
 
@@ -146,14 +159,43 @@ personName.addEventListener("keydown", (e) => {
   }
 });
 
-function validateWatering() {
+async function validateWatering() {
+  if (!plant) return;
+
   const name = personName.value.trim();
   if (!name) return;
 
-  data.lastWateredBy = name;
-  data.lastWateredAt = new Date().toISOString();
+  const nowIso = new Date().toISOString();
 
-  saveData(data);
+  const { data, error } = await supabaseClient
+    .from("plants")
+    .update({
+      last_watered_by: name,
+      last_watered_at: nowIso
+    })
+    .eq("id", plant.id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Erreur mise à jour plante :", error);
+    alert("Impossible d’enregistrer l’arrosage.");
+    return;
+  }
+
+  const logResult = await supabaseClient
+    .from("watering_log")
+    .insert({
+      plant_id: plant.id,
+      watered_by: name,
+      watered_at: nowIso
+    });
+
+  if (logResult.error) {
+    console.error("Erreur ajout historique :", logResult.error);
+  }
+
+  plant = data;
   render();
 
   nameModal.classList.add("hidden");
@@ -164,4 +206,4 @@ function validateWatering() {
   }, 2500);
 }
 
-render();
+loadPlant();
