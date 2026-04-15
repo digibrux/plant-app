@@ -82,18 +82,25 @@
     </footer>
   </div>
 
-  <div id="nameModal" class="modal hidden">
-    <div class="modal-content">
-      <h3>Qui arrose la plante ?</h3>
-      <label for="personName">Votre prénom ou votre nom</label>
-      <input id="personName" type="text" placeholder="Ex. Julien" />
-      <div class="modal-actions">
-        <button id="cancelButton" type="button" class="secondary-button">Annuler</button>
-        <button id="confirmButton" type="button" class="main-button small">OK</button>
-      </div>
-    </div>
-  </div>
+<div id="nameModal" class="modal hidden">
+  <div class="modal-content">
+    <h3>Qui arrose la plante ?</h3>
 
+    <label for="personName">Votre prénom ou votre nom</label>
+    <input id="personName" type="text" placeholder="Ex. Julien" />
+
+    <div class="modal-actions">
+      <button id="cancelButton" type="button" class="secondary-button">
+        Annuler
+      </button>
+
+      <button id="confirmButton" type="button" class="main-button small">
+        OK
+      </button>
+    </div>
+
+  </div>
+</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
 </body>
