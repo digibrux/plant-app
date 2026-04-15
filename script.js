@@ -1,3 +1,6 @@
+const SUPABASE_URL = "https://ngnnskdmmkilytdbdtts.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nbm5za2RtbWtpbHl0ZGJkdHRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MDE2NDQsImV4cCI6MjA5MTQ3NzY0NH0.KJD56TEcsn06BxTbtAq55EomdvhJbhJ9JsQxVS9CV7w";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const STORAGE_KEY = "plant-watering-app-static-v1";
 const DAY_MS = 1000 * 60 * 60 * 24;
 
