@@ -63,7 +63,7 @@
         <span>↗</span>
       </a>
 
-      <button id="waterButton" type="button" class="main-button">Je veux arroser la plante</button>
+      <button id="waterButton" class="main-button">Je veux arroser la plante</button>
 
       <div id="thankYouMessage" class="thank-you hidden">
         Merci d’avoir arrosé la plante.
@@ -72,7 +72,7 @@
 
     <section class="card qr-card">
       <h2>QR code d’accès</h2>
-      <p>Une fois la page publiée, vous pourrez transformer cette adresse en QR code.</p>
+      <p>Après publication, vous pourrez créer un QR code pointant vers l’adresse de cette page.</p>
       <p id="pageUrl" class="page-url"></p>
     </section>
 
@@ -82,26 +82,18 @@
     </footer>
   </div>
 
-<div id="nameModal" class="modal hidden">
-  <div class="modal-content">
-    <h3>Qui arrose la plante ?</h3>
-
-    <label for="personName">Votre prénom ou votre nom</label>
-    <input id="personName" type="text" placeholder="Ex. Julien" />
-
-    <div class="modal-actions">
-      <button id="cancelButton" type="button" class="secondary-button">
-        Annuler
-      </button>
-
-      <button id="confirmButton" type="button" class="main-button small">
-        OK
-      </button>
+  <div id="nameModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Qui arrose la plante ?</h3>
+      <label for="personName">Votre prénom ou votre nom</label>
+      <input id="personName" type="text" placeholder="Ex. Julien" />
+      <div class="modal-actions">
+        <button id="cancelButton" class="secondary-button">Annuler</button>
+        <button id="confirmButton" class="main-button small">OK</button>
+      </div>
     </div>
-
   </div>
-</div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="script.js"></script>
 </body>
 </html>
