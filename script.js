@@ -1,217 +1,164 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const SUPABASE_URL = "https://ngnnskdmmkilytdbdtts.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_NrSZ8cvWZO0WwhsvxIwsOQ_c-3JDaEK";
-  const PLANT_SLUG = "pachira-bruxeo";
-  const DAY_MS = 1000 * 60 * 60 * 24;
+const STORAGE_KEY = "plant-watering-app-static-v1";
+const DAY_MS = 1000 * 60 * 60 * 24;
 
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const defaultData = {
+  plantName: "Pachira Aquatica",
+  wateringIntervalDays: 7,
+  lastWateredAt: null,
+  lastWateredBy: "Personne pour le moment"
+};
 
-  const statusBox = document.getElementById("statusBox");
-  const statusLabel = document.getElementById("statusLabel");
-  const statusIcon = document.getElementById("statusIcon");
-  const statusMessage = document.getElementById("statusMessage");
-  const statusDetail = document.getElementById("statusDetail");
-  const lastWateredBy = document.getElementById("lastWateredBy");
-  const lastWateredAt = document.getElementById("lastWateredAt");
-  const wateringInterval = document.getElementById("wateringInterval");
-  const waterButton = document.getElementById("waterButton");
-  const thankYouMessage = document.getElementById("thankYouMessage");
-  const nameModal = document.getElementById("nameModal");
-  const personName = document.getElementById("personName");
-  const cancelButton = document.getElementById("cancelButton");
-  const confirmButton = document.getElementById("confirmButton");
-  const pageUrl = document.getElementById("pageUrl");
+const statusBox = document.getElementById("statusBox");
+const statusLabel = document.getElementById("statusLabel");
+const statusIcon = document.getElementById("statusIcon");
+const statusMessage = document.getElementById("statusMessage");
+const statusDetail = document.getElementById("statusDetail");
+const lastWateredBy = document.getElementById("lastWateredBy");
+const lastWateredAt = document.getElementById("lastWateredAt");
+const wateringInterval = document.getElementById("wateringInterval");
+const waterButton = document.getElementById("waterButton");
+const thankYouMessage = document.getElementById("thankYouMessage");
+const nameModal = document.getElementById("nameModal");
+const personName = document.getElementById("personName");
+const cancelButton = document.getElementById("cancelButton");
+const confirmButton = document.getElementById("confirmButton");
+const pageUrl = document.getElementById("pageUrl");
 
-  let plant = null;
+function loadData() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) return { ...defaultData };
 
-  function formatDate(dateString) {
-    if (!dateString) return "Jamais arrosée";
+  try {
+    return { ...defaultData, ...JSON.parse(saved) };
+  } catch {
+    return { ...defaultData };
+  }
+}
 
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("fr-BE", {
-      dateStyle: "full",
-      timeStyle: "short"
-    }).format(date);
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "Jamais arrosée";
+
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat("fr-BE", {
+    dateStyle: "full",
+    timeStyle: "short"
+  }).format(date);
+}
+
+function startOfToday() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function diffInDays(fromDate, toDate) {
+  return Math.floor((toDate.getTime() - fromDate.getTime()) / DAY_MS);
+}
+
+let data = loadData();
+
+function render() {
+  lastWateredBy.textContent = data.lastWateredBy;
+  lastWateredAt.textContent = formatDate(data.lastWateredAt);
+  wateringInterval.value = data.wateringIntervalDays;
+  pageUrl.textContent = window.location.href;
+
+  statusBox.classList.remove("status-ok", "status-late");
+  statusMessage.classList.remove("green-text", "red-text");
+
+  if (!data.lastWateredAt) {
+    statusBox.classList.add("status-late");
+    statusLabel.textContent = "Arrosage à faire";
+    statusIcon.textContent = "⚠️";
+    statusMessage.textContent = "Cette plante n'a pas encore d'arrosage enregistré.";
+    statusMessage.classList.add("red-text");
+    statusDetail.textContent = "Vous pouvez l’arroser maintenant.";
+    return;
   }
 
-  function startOfToday() {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }
+  const lastDate = new Date(data.lastWateredAt);
+  const dueDate = new Date(lastDate.getTime() + data.wateringIntervalDays * DAY_MS);
+  const today = startOfToday();
+  const dueDateStart = new Date(dueDate);
+  dueDateStart.setHours(0, 0, 0, 0);
 
-  function diffInDays(fromDate, toDate) {
-    return Math.floor((toDate.getTime() - fromDate.getTime()) / DAY_MS);
-  }
+  const daysRemaining = diffInDays(today, dueDateStart);
 
-  function clearStatusStyles() {
-    statusBox.classList.remove("status-green", "status-orange", "status-red");
-    statusMessage.classList.remove("status-green-text", "status-orange-text", "status-red-text");
-  }
+  if (daysRemaining >= 0) {
+    statusBox.classList.add("status-ok");
+    statusLabel.textContent = "Tout va bien";
+    statusIcon.textContent = "✅";
+    statusMessage.classList.add("green-text");
 
-  async function loadPlant() {
-    const { data, error } = await supabaseClient
-      .from("plants")
-      .select("*")
-      .eq("slug", PLANT_SLUG)
-      .single();
-
-    if (error) {
-      console.error("Erreur chargement plante :", error);
-      statusLabel.textContent = "Erreur";
-      statusIcon.textContent = "⚠️";
-      statusMessage.textContent = "Impossible de charger les données de la plante.";
-      statusDetail.textContent = "Vérifiez la configuration Supabase.";
-      return;
+    if (daysRemaining === 0) {
+      statusMessage.textContent = "Arrosage prévu aujourd’hui.";
+    } else {
+      statusMessage.textContent = `Il reste ${daysRemaining} jour${daysRemaining > 1 ? "s" : ""} avant le prochain arrosage.`;
     }
 
-    plant = data;
-    render();
-  }
-
-  function render() {
-    if (!plant) return;
-
-    lastWateredBy.textContent = plant.last_watered_by || "Personne pour le moment";
-    lastWateredAt.textContent = formatDate(plant.last_watered_at);
-    wateringInterval.value = plant.watering_interval_days || 7;
-    pageUrl.textContent = window.location.href;
-
-    clearStatusStyles();
-
-    if (!plant.last_watered_at) {
-      statusBox.classList.add("status-red");
-      statusMessage.classList.add("status-red-text");
-      statusLabel.textContent = "À arroser";
-      statusIcon.textContent = "🚨";
-      statusMessage.textContent = "La plante n’a pas encore d’arrosage enregistré.";
-      statusDetail.textContent =
-        "Attention, votre plante a besoin d'être arrosée ! Si besoin, reportez vous aux détails de cette plante sur la page d'accueil.";
-      return;
-    }
-
-    const lastDate = new Date(plant.last_watered_at);
-    const today = startOfToday();
-    const lastDateStart = new Date(lastDate);
-    lastDateStart.setHours(0, 0, 0, 0);
-
-    const daysSinceLastWatering = Math.max(0, diffInDays(lastDateStart, today));
-
-    if (daysSinceLastWatering < 5) {
-      statusBox.classList.add("status-green");
-      statusMessage.classList.add("status-green-text");
-      statusLabel.textContent = "Statut OK";
-      statusIcon.textContent = "✅";
-      statusMessage.textContent = `La plante a été arrosée il y a ${daysSinceLastWatering} jour${daysSinceLastWatering > 1 ? "s" : ""}.`;
-      statusDetail.textContent = "Tout est en ordre, votre plante a assez d'eau.";
-      return;
-    }
-
-    if (daysSinceLastWatering <= 7) {
-      statusBox.classList.add("status-orange");
-      statusMessage.classList.add("status-orange-text");
-      statusLabel.textContent = "Bientôt à arroser";
-      statusIcon.textContent = "🟠";
-      statusMessage.textContent = `La plante a été arrosée il y a ${daysSinceLastWatering} jour${daysSinceLastWatering > 1 ? "s" : ""}.`;
-      statusDetail.textContent = "Vous devriez bientôt arroser la plante";
-      return;
-    }
-
-    statusBox.classList.add("status-red");
-    statusMessage.classList.add("status-red-text");
-    statusLabel.textContent = "Arrosage urgent";
-    statusIcon.textContent = "🔴";
-    statusMessage.textContent = `La plante a été arrosée il y a ${daysSinceLastWatering} jour${daysSinceLastWatering > 1 ? "s" : ""}.`;
     statusDetail.textContent =
-      "Attention, votre plante a besoin d'être arrosée ! Si besoin, reportez vous aux détails de cette plante sur la page d'accueil.";
+      "Prochain arrosage conseillé : " +
+      new Intl.DateTimeFormat("fr-BE", { dateStyle: "full" }).format(dueDate) +
+      ".";
+  } else {
+    const overdueDays = Math.abs(daysRemaining);
+    statusBox.classList.add("status-late");
+    statusLabel.textContent = "En retard";
+    statusIcon.textContent = "⚠️";
+    statusMessage.classList.add("red-text");
+    statusMessage.textContent = `L'arrosage a ${overdueDays} jour${overdueDays > 1 ? "s" : ""} de retard.`;
+    statusDetail.textContent =
+      "Le prochain arrosage aurait dû être fait le " +
+      new Intl.DateTimeFormat("fr-BE", { dateStyle: "full" }).format(dueDate) +
+      ".";
   }
+}
 
-  waterButton.addEventListener("click", () => {
-    nameModal.classList.remove("hidden");
-    personName.value = "";
-    personName.focus();
-  });
-
-  cancelButton.addEventListener("click", () => {
-    nameModal.classList.add("hidden");
-  });
-
-  personName.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      validateWatering();
-    }
-  });
-
-  confirmButton.addEventListener("click", () => {
-    validateWatering();
-  });
-
-  wateringInterval.addEventListener("change", async () => {
-    if (!plant) return;
-
-    const value = Math.max(1, Number(wateringInterval.value) || 1);
-
-    const { data, error } = await supabaseClient
-      .from("plants")
-      .update({ watering_interval_days: value })
-      .eq("id", plant.id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Erreur mise à jour fréquence :", error);
-      return;
-    }
-
-    plant = data;
-    render();
-  });
-
-  async function validateWatering() {
-    if (!plant) return;
-
-    const name = personName.value.trim();
-    if (!name) return;
-
-    const nowIso = new Date().toISOString();
-
-    const { data, error } = await supabaseClient
-      .from("plants")
-      .update({
-        last_watered_by: name,
-        last_watered_at: nowIso
-      })
-      .eq("id", plant.id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Erreur mise à jour plante :", error);
-      return;
-    }
-
-    const logResult = await supabaseClient
-      .from("watering_log")
-      .insert({
-        plant_id: plant.id,
-        watered_by: name,
-        watered_at: nowIso
-      });
-
-    if (logResult.error) {
-      console.error("Erreur historique :", logResult.error);
-    }
-
-    plant = data;
-    render();
-
-    nameModal.classList.add("hidden");
-    thankYouMessage.classList.remove("hidden");
-
-    setTimeout(() => {
-      thankYouMessage.classList.add("hidden");
-    }, 2500);
-  }
-
-  loadPlant();
+wateringInterval.addEventListener("change", () => {
+  const value = Math.max(1, Number(wateringInterval.value) || 1);
+  data.wateringIntervalDays = value;
+  saveData(data);
+  render();
 });
+
+waterButton.addEventListener("click", () => {
+  personName.value = "";
+  nameModal.classList.remove("hidden");
+  personName.focus();
+});
+
+cancelButton.addEventListener("click", () => {
+  nameModal.classList.add("hidden");
+});
+
+confirmButton.addEventListener("click", validateWatering);
+
+personName.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    validateWatering();
+  }
+});
+
+function validateWatering() {
+  const name = personName.value.trim();
+  if (!name) return;
+
+  data.lastWateredBy = name;
+  data.lastWateredAt = new Date().toISOString();
+
+  saveData(data);
+  render();
+
+  nameModal.classList.add("hidden");
+  thankYouMessage.classList.remove("hidden");
+
+  setTimeout(() => {
+    thankYouMessage.classList.add("hidden");
+  }, 2500);
+}
+
+render();
