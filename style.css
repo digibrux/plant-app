@@ -236,6 +236,10 @@ h1 {
   padding: 16px;
 }
 
+.modal.hidden {
+  display: none;
+}
+
 .modal-content {
   background: white;
   border-radius: 24px;
